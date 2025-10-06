@@ -14,55 +14,90 @@
         </header>
 
         <main>
-            <!-- 🔹 NOVO: Abas -->
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="estoque">Estoque</button>
-                <button class="tab-btn" data-tab="requisicoes">Requisições</button>
-            </div>
+            <!-- Seção de busca -->
+            <section class="search-section">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Buscar produtos por nome, código ou local...">
+                    <button type="button" id="clearSearch">Limpar</button>
+                </div>
+            </section>
 
-            <!-- 🔹 Aba Estoque (seu conteúdo original dentro dela) -->
-            <div class="tab-content active" id="tab-estoque">
-                <!-- Seção de busca -->
-                <section class="search-section">
-                    <div class="search-container">
-                        <input type="text" id="searchInput" placeholder="Buscar produtos por nome, código ou local...">
-                        <button type="button" id="clearSearch">Limpar</button>
-                    </div>
-                </section>
 
-                <!-- Botão para adicionar novo item -->
-                <section class="actions-section">
-                    <button type="button" id="addItemBtn" class="btn-primary">+ Adicionar Item</button>
-                    <div class="stats">
-                        <span id="totalItems">Total de itens: 0</span>
-                    </div>
-                </section>
 
-                <!-- Lista de produtos -->
-                <section class="products-section">
+
+
+            <!-- Seção de abas -->
+            <section class="tabs-section">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="products">Produtos</button>
+                    <button class="tab-button" data-tab="request">Requisição</button>
+                    <button class="tab-button" data-tab="dashboard">Dashboard</button>
+                </div>
+
+                <div id="productsTabContent" class="tab-content active products-section">
+                    <section class="actions-section">
+                        <button type="button" id="addItemBtn" class="btn-primary">+ Adicionar Item</button>
+                        <div class="stats">
+                            <span id="totalItems">Total de itens: 0</span>
+                        </div>
+                    </section>
+                    <!-- Conteúdo da seção de produtos (já existente) -->
                     <div class="products-header">
                         <h2>Produtos em Estoque</h2>
                     </div>
-                    <div id="productsList" class="products-list"></div>
+                    <div id="productsList" class="products-list">
+                        <!-- Produtos renderizados dinamicamente -->
+                    </div>
                     <div id="emptyState" class="empty-state">
                         <p>Nenhum produto encontrado no estoque.</p>
                         <p>Clique em "Adicionar Item" para começar.</p>
                     </div>
-                </section>
-            </div>
+                </div>
 
-            <!-- 🔹 Aba Requisições -->
-            <div class="tab-content" id="tab-requisicoes">
-                <section class="requisicoes-section">
-                    <div class="requisicoes-header">
-                        <h2>Requisições</h2>
-                        <button type="button" id="novaRequisicaoBtn" class="btn-primary">+ Nova Requisição</button>
-                    </div>
-                    <div id="requisicoesList" class="requisicoes-list">
-                        <!-- Requisições renderizadas dinamicamente -->
-                    </div>
-                </section>
-            </div>
+                <div id="requestTabContent" class="tab-content">
+                    <section class="request-section">
+                        <h2>Criar Requisição</h2>
+                        <form id="requestForm">
+                            <div class="form-group">
+                                <label for="requestProductSelect">Produto</label>
+                                <select id="requestProductSelect" required>
+                                    <option value="">Selecione um produto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="requestQuantity">Quantidade</label>
+                                <input type="number" id="requestQuantity" min="1" value="1" required>
+                            </div>
+                            <button type="button" id="addRequestItemBtn" class="btn-primary">Adicionar à Requisição</button>
+                        </form>
+                        <h3>Itens da Requisição</h3>
+                        <div id="requestItemsList"></div>
+                        <button type="button" id="confirmRequestBtn" class="btn-primary">Confirmar Requisição</button>
+                    </section>
+                </div>
+
+                <div id="dashboardTabContent" class="tab-content">
+                    <section class="dashboard-section">
+                        <h2>Dashboard de Estoque</h2>
+                        <div class="dashboard-stats">
+                            <div class="stat-card">
+                                <h3>Total de Produtos</h3>
+                                <p id="dashboardTotalProducts">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total de Unidades</h3>
+                                <p id="dashboardTotalQuantity">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Produtos com Baixo Estoque</h3>
+                                <p id="dashboardLowStock">0</p>
+                            </div>
+                        </div>
+                        <h3>Produtos por Localização</h3>
+                        <canvas id="productsByLocationChart"></canvas>
+                    </section>
+                </div>
+            </section>
         </main>
 
         <!-- Modal para adicionar/editar produtos -->
@@ -116,33 +151,6 @@
                     <button type="button" id="cancelDelete" class="btn-secondary">Cancelar</button>
                     <button type="button" id="confirmDelete" class="btn-danger">Excluir</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- 🔹 Novo Modal: Nova Requisição -->
-        <div id="requisicaoModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Nova Requisição</h3>
-                    <button type="button" class="close-btn" onclick="inventorySystem.closeModal('requisicaoModal')">&times;</button>
-                </div>
-                <form id="requisicaoForm">
-                    <div class="form-group">
-                        <label for="departamento">Departamento/Setor</label>
-                        <select id="departamento" required>
-                            <option value="">Selecione</option>
-                            <option value="BISCOITO">BISCOITO</option>
-                            <option value="EMBALAGEM">EMBALAGEM</option>
-                            <option value="TI">TI</option>
-                            <!-- Pode puxar dinamicamente depois -->
-                        </select>
-                    </div>
-                    <div id="produtosRequisicao"></div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="inventorySystem.closeModal('requisicaoModal')">Cancelar</button>
-                        <button type="submit" class="btn-primary">Salvar Requisição</button>
-                    </div>
-                </form>
             </div>
         </div>
 
